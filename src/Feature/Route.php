@@ -39,6 +39,9 @@ class Route implements FeatureInterface
     /** @var bool */
     protected $Antialiasing;
 
+    /** @var bool */
+    protected $AntialiasingNative = false;
+
     /** @var float [px] */
     protected $LineSimplificationTolerance = 0.0;
 
@@ -59,9 +62,10 @@ class Route implements FeatureInterface
         $this->AntialiasDrawer = new AntialiasDrawer();
     }
 
-    public function enableAntialiasing(bool $flag)
+    public function enableAntialiasing(bool $flag = true, bool $nativeFlag = false)
     {
         $this->Antialiasing = $antialiasing;
+        $this->AntialiasingNative = $nativeFlag;
     }
 
     public function enableLineSimplification(float $pixelTolerance = 10)
@@ -83,6 +87,8 @@ class Route implements FeatureInterface
 
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
+        $this->AntialiasDrawer->enableNativeAntialiasingIfAvailable($this->AntialiasingNative);
+
         foreach ($this->LineSegments as $segment) {
             $numPoints = count($segment);
             $lastPoint = 0;
@@ -106,7 +112,7 @@ class Route implements FeatureInterface
 
                 $this->truncateStartAndEndPointsBy(0.2, $x1, $y1, $x2, $y2);
 
-                if ($this->Antialiasing && !function_exists('imageantialias')) {
+                if ($this->Antialiasing) {
                     $this->AntialiasDrawer->drawLine(
                         $image->getCore(),
                         $x1,
@@ -120,6 +126,7 @@ class Route implements FeatureInterface
                         $this->LineWidth
                     );
                 } else {
+                    imagesetthickness($image->getCore(), $this->LineWidth);
                     $image->line($x1, $y1, $x2, $y2, $this->LineCallback);
                 }
 

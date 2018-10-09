@@ -18,6 +18,9 @@ class AntialiasDrawer
     /** @var bool */
     protected $IsNativeFunctionAvailable;
 
+    /** @var bool */
+    protected $UseNativeFunctionIfAvailable = false;
+
     /** @var float */
     protected $AntialiasThreshold;
 
@@ -27,9 +30,14 @@ class AntialiasDrawer
         $this->AntialiasThreshold = $antialiasThreshold;
     }
 
+    public function enableNativeAntialiasingIfAvailable(bool $flag)
+    {
+        $this->UseNativeFunctionIfAvailable = $flag;
+    }
+
     public function drawLine($resource, $x1, $y1, $x2, $y2, int $r, int $g, int $b, float $alpha = 100.0, int $lineWidth = 1)
     {
-        if ($this->IsNativeFunctionAvailable) {
+        if ($this->IsNativeFunctionAvailable && $this->UseNativeFunctionIfAvailable) {
             $this->drawNativeLine($resource, $x1, $y1, $x2, $y2, $r, $g, $b, $alpha, $lineWidth);
         } else {
             $this->drawAntialiasLine($resource, $x1, $y1, $x2, $y2, $r, $g, $b, $alpha, $lineWidth);
@@ -38,6 +46,11 @@ class AntialiasDrawer
 
     protected function drawNativeLine($resource, $x1, $y1, $x2, $y2, int $r, int $g, int $b, float $alpha = 100.0, int $lineWidth = 1)
     {
+        $x1 = (int)round($x1);
+        $x2 = (int)round($x2);
+        $y1 = (int)round($y1);
+        $y2 = (int)round($y2);
+
         imagesetthickness($resource, $lineWidth);
         imagealphablending($resource, true);
         imageantialias($resource, true);
