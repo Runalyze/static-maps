@@ -54,7 +54,7 @@ class Route implements FeatureInterface
         $this->LineColor = $this->getLineColorArray($lineColor);
     }
 
-    public function enableLineSimplification(float $pixelTolerance = 10)
+    public function enableLineSimplification(float $pixelTolerance = 10.0)
     {
         $this->LineSimplificationTolerance = $pixelTolerance;
     }
@@ -125,12 +125,16 @@ class Route implements FeatureInterface
         return $coordinates;
     }
 
-    public function getBoundingBox(float $paddingInPercent = 0.0): BoundingBoxInterface
+    public function getBoundingBox(float $paddingInPercent = 0.0, float $paddingRight = null, float $paddingBottom = null, float $paddingLeft = null): BoundingBoxInterface
     {
         $minLatitude = 90.0;
         $maxLatitude = -90.0;
         $minLongitude = 180.0;
         $maxLongitude = -180.0;
+        $paddingTop = $paddingInPercent;
+        $paddingRight = null === $paddingRight ? $paddingInPercent : $paddingRight;
+        $paddingBottom = null === $paddingBottom ? $paddingInPercent : $paddingBottom;
+        $paddingLeft = null === $paddingLeft ? $paddingInPercent : $paddingLeft;
 
         foreach ($this->LineSegments as $segment) {
             foreach ($segment as $coordinates) {
@@ -152,14 +156,14 @@ class Route implements FeatureInterface
             }
         }
 
-        if ($paddingInPercent > 0.0) {
+        if (0.0 < max($paddingTop, $paddingRight, $paddingBottom, $paddingLeft)) {
             $deltaLatitude = $maxLatitude - $minLatitude;
             $deltaLongitude = $maxLongitude - $minLongitude;
 
-            $minLatitude -= $deltaLatitude * $paddingInPercent / 100.0;
-            $maxLatitude += $deltaLatitude * $paddingInPercent / 100.0;
-            $minLongitude -= $deltaLongitude * $paddingInPercent / 100.0;
-            $maxLongitude += $deltaLongitude * $paddingInPercent / 100.0;
+            $minLatitude -= $deltaLatitude * $paddingBottom / 100.0;
+            $maxLatitude += $deltaLatitude * $paddingTop / 100.0;
+            $minLongitude -= $deltaLongitude * $paddingLeft / 100.0;
+            $maxLongitude += $deltaLongitude * $paddingRight / 100.0;
         }
 
         return new BoundingBox($minLatitude, $maxLatitude, $minLongitude, $maxLongitude);

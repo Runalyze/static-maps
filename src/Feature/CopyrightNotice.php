@@ -26,6 +26,18 @@ class CopyrightNotice implements FeatureInterface
     /** @var callable */
     protected $FontCallback;
 
+    /** @var string */
+    protected $BackgroundColor = 'rgba(255, 255, 255, 0.5)';
+
+    /** @var string */
+    protected $Position = 'bottom-right';
+
+    /** @var int [px] */
+    protected $OffsetX = 0;
+
+    /** @var int [px] */
+    protected $OffsetY = 0;
+
     /**
      * @param string $text
      * @param null|callable(AbstractFont): void $fontCallback
@@ -37,6 +49,21 @@ class CopyrightNotice implements FeatureInterface
         };
     }
 
+    public function setBackgroundColor(string $rgba): self
+    {
+        $this->BackgroundColor = $rgba;
+
+        return $this;
+    }
+
+    public function setPosition(string $position, int $offsetX = 0, int $offsetY = 0): self
+    {
+        $this->Position = $position;
+        $this->OffsetX = $offsetX;
+        $this->OffsetY = $offsetY;
+
+        return $this;
+    }
 
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
@@ -44,13 +71,14 @@ class CopyrightNotice implements FeatureInterface
         $this->applyFontCallbacks($font);
         $size = $font->getBoxSize();
 
-        $watermarkBackground = $imageManager->canvas($size['width'] + 10, $size['height'] + 5, 'rgba(255, 255, 255, 0.5)');
-        $watermark = $imageManager->canvas($size['width'] + 5, $size['height']);
+        $watermarkBackground = $imageManager->canvas($size['width'] + 10, $size['height'] + 5, $this->BackgroundColor);
+        $watermark = $imageManager->canvas($size['width'], $size['height']);
 
-        $font->applyToImage($watermark);
+        $font->applyToImage($watermark, 0, 2);
 
-        $image->insert($watermarkBackground, 'bottom-right');
-        $image->insert($watermark, 'bottom-right');
+        $watermarkBackground->insert($watermark, 'center');
+
+        $image->insert($watermarkBackground, $this->Position, $this->OffsetX, $this->OffsetY);
     }
 
     protected function applyFontCallbacks(AbstractFont $font)
