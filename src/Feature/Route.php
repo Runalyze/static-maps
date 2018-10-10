@@ -17,7 +17,7 @@ use Intervention\Image\Gd\Color;
 use Intervention\Image\Gd\Shapes\LineShape;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use Runalyze\StaticMaps\Drawer\AntialiasDrawer;
+use Runalyze\StaticMaps\Drawer\Polyline\AntialiasPolylineDrawer;
 use Runalyze\StaticMaps\Viewport\BoundingBox;
 use Runalyze\StaticMaps\Viewport\BoundingBoxInterface;
 use Runalyze\StaticMaps\Viewport\ViewportInterface;
@@ -36,12 +36,6 @@ class Route implements FeatureInterface
     /** @var array */
     protected $LineColor;
 
-    /** @var bool */
-    protected $Antialiasing;
-
-    /** @var bool */
-    protected $AntialiasingNative = false;
-
     /** @var float [px] */
     protected $LineSimplificationTolerance = 0.0;
 
@@ -50,7 +44,7 @@ class Route implements FeatureInterface
      * @param string|array $color
      * @param int $lineWidth
      */
-    public function __construct(array $coordinates, $lineColor = '#000', int $lineWidth = 1, bool $antialiasing = true)
+    public function __construct(array $coordinates, $lineColor = '#000', int $lineWidth = 1)
     {
         $this->LineSegments = $this->getLineSegments($coordinates);
         $this->LineCallback = function (LineShape $draw) use ($lineColor) {
@@ -58,14 +52,6 @@ class Route implements FeatureInterface
         };
         $this->LineWidth = $lineWidth;
         $this->LineColor = $this->getLineColorArray($lineColor);
-        $this->Antialiasing = $antialiasing;
-        $this->AntialiasDrawer = new AntialiasDrawer();
-    }
-
-    public function enableAntialiasing(bool $flag = true, bool $nativeFlag = false)
-    {
-        $this->Antialiasing = $antialiasing;
-        $this->AntialiasingNative = $nativeFlag;
     }
 
     public function enableLineSimplification(float $pixelTolerance = 10)
@@ -87,9 +73,11 @@ class Route implements FeatureInterface
 
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
-        $this->AntialiasDrawer->enableNativeAntialiasingIfAvailable($this->AntialiasingNative);
+        $drawer = new AntialiasPolylineDrawer();
+        $drawer->setPainter($this->LineColor[0], $this->LineColor[1], $this->LineColor[2], $this->LineColor[3], $this->LineWidth);
 
         foreach ($this->LineSegments as $segment) {
+            $points = [$this->getRelativePositionForPoint($viewport, $segment[0])];
             $numPoints = count($segment);
             $lastPoint = 0;
 
@@ -99,62 +87,29 @@ class Route implements FeatureInterface
             }
 
             for ($i = 1; $i < $numPoints; ++$i) {
-                $x1 = $viewport->getRelativePositionForLongitude($segment[$lastPoint][1]);
-                $y1 = $viewport->getRelativePositionForLatitude($segment[$lastPoint][0]);
-                $x2 = $viewport->getRelativePositionForLongitude($segment[$i][1]);
-                $y2 = $viewport->getRelativePositionForLatitude($segment[$i][0]);
+                list($x1, $y1) = $this->getRelativePositionForPoint($viewport, $segment[$lastPoint]);
+                list($x2, $y2) = $this->getRelativePositionForPoint($viewport, $segment[$i]);
 
-                if ($this->LineSimplificationTolerance > 0.0 && $i != $numPoints - 1) {
-                    if (sqrt(pow($x2 - $x1, 2.0) + pow($y2 - $y1, 2.0)) < $this->LineSimplificationTolerance) {
-                        continue;
-                    }
+                if (0.0 < $this->LineSimplificationTolerance && $i !== $numPoints - 1 && sqrt(pow($x2 - $x1, 2.0) + pow($y2 - $y1, 2.0)) < $this->LineSimplificationTolerance) {
+                    continue;
                 }
 
-                $this->truncateStartAndEndPointsBy(0.2, $x1, $y1, $x2, $y2);
-
-                if ($this->Antialiasing) {
-                    $this->AntialiasDrawer->drawLine(
-                        $image->getCore(),
-                        $x1,
-                        $y1,
-                        $x2,
-                        $y2,
-                        $this->LineColor[0],
-                        $this->LineColor[1],
-                        $this->LineColor[2],
-                        $this->LineColor[3],
-                        $this->LineWidth
-                    );
-                } else {
-                    imagesetthickness($image->getCore(), $this->LineWidth);
-                    $image->line($x1, $y1, $x2, $y2, $this->LineCallback);
-                }
-
+                $points[] = [$x2, $y2];
                 $lastPoint = $i;
             }
+
+            $drawer->addPolyline($points);
         }
+
+        $drawer->drawPolylines($image->getCore());
     }
 
-    protected function truncateStartAndEndPointsBy(float $pixel, &$x1, &$y1, &$x2, &$y2)
+    protected function getRelativePositionForPoint(ViewportInterface $viewport, array $point): array
     {
-        if ($x1 == $x2) {
-            if ($y2 > $y1) {
-                $y1 += $pixel;
-                $y2 -= $pixel;
-            } else {
-                $y1 -= $pixel;
-                $y2 += $pixel;
-            }
-        } else {
-            $gradient = ($y2 - $y1) / ($x2 - $x1);
-            $deltaX = $pixel / sqrt(1.0 + $gradient * $gradient);
-            $deltaY = $gradient * $deltaX;
-
-            $x1 += $deltaX;
-            $y1 += $deltaY;
-            $x2 -= $deltaX;
-            $y2 -= $deltaY;
-        }
+        return [
+            $viewport->getRelativePositionForLongitude($point[1]),
+            $viewport->getRelativePositionForLatitude($point[0])
+        ];
     }
 
     protected function getLineSegments(array $coordinates): array

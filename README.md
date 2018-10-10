@@ -71,7 +71,7 @@ The MIT License (MIT). Please see [License File](LICENSE) for more information.
 [ico-downloads]: https://img.shields.io/packagist/dt/runalyze/static-maps.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/runalyze/static-maps
-[link-travis]: https://travis-ci.org/runalyze/static-maps
+[link-travis]: https://travis-ci.org/Runalyze/static-maps
 [link-scrutinizer]: https://scrutinizer-ci.com/g/runalyze/static-maps/code-structure
 [link-code-quality]: https://scrutinizer-ci.com/g/runalyze/static-maps
 [link-downloads]: https://packagist.org/packages/runalyze/static-maps
