@@ -28,4 +28,6 @@ interface BoundingBoxInterface
     public function getCenterLatitude(): float;
 
     public function getCenterLongitude(): float;
+
+    public function extendBy(float $paddingInPercent = 0.0, float $paddingRight = null, float $paddingBottom = null, float $paddingLeft = null): self;
 }

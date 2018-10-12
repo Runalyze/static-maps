@@ -45,16 +45,16 @@ class RouteTest extends TestCase
         ]);
 
         $this->assertFalse($route->isEmpty());
-        $this->assertThatBoundingBoxIsEqual(new BoundingBox(50.0, 51.0, 10.0, 10.1), $route->getBoundingBox());
-        $this->assertThatBoundingBoxIsEqual(new BoundingBox(49.9, 51.1, 9.99, 10.11), $route->getBoundingBox(10.0));
-        $this->assertThatBoundingBoxIsEqual(new BoundingBox(50.0, 51.1, 9.95, 10.1), $route->getBoundingBox(10.0, 0.0, 0.0, 50.0));
+        $this->assertThatBoundingBoxIsEqual(new BoundingBox(50.000, 51.000, 10.000, 10.100), $route->getBoundingBox());
+        $this->assertThatBoundingBoxIsEqual(new BoundingBox(49.888, 51.110, 9.989, 10.111), $route->getBoundingBox(10.0));
+        $this->assertThatBoundingBoxIsEqual(new BoundingBox(50.000, 51.110, 9.900, 10.100), $route->getBoundingBox(10.0, 0.0, 0.0, 50.0));
     }
 
     protected function assertThatBoundingBoxIsEqual(BoundingBoxInterface $expected, BoundingBoxInterface $actual)
     {
-        $this->assertEquals($expected->getMinLatitude(), $actual->getMinLatitude());
-        $this->assertEquals($expected->getMaxLatitude(), $actual->getMaxLatitude());
-        $this->assertEquals($expected->getMinLongitude(), $actual->getMinLongitude());
-        $this->assertEquals($expected->getMaxLongitude(), $actual->getMaxLongitude());
+        $this->assertEquals($expected->getMinLatitude(), $actual->getMinLatitude(), '', 0.001);
+        $this->assertEquals($expected->getMaxLatitude(), $actual->getMaxLatitude(), '', 0.001);
+        $this->assertEquals($expected->getMinLongitude(), $actual->getMinLongitude(), '', 0.001);
+        $this->assertEquals($expected->getMaxLongitude(), $actual->getMaxLongitude(), '', 0.001);
     }
 }

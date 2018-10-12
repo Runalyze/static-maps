@@ -23,10 +23,7 @@ class BoundingBoxTest extends TestCase
     {
         $boundingBox = new BoundingBox($minLatitude, $maxLatitude, $minLongitude, $maxLongitude);
 
-        $this->assertEquals($minLatitude, $boundingBox->getMinLatitude());
-        $this->assertEquals($maxLatitude, $boundingBox->getMaxLatitude());
-        $this->assertEquals($minLongitude, $boundingBox->getMinLongitude());
-        $this->assertEquals($maxLongitude, $boundingBox->getMaxLongitude());
+        $this->assertThatBoundingBoxEquals([$minLatitude, $maxLatitude, $minLongitude, $maxLongitude], $boundingBox);
         $this->assertEquals($expectedCenterLatitude, $boundingBox->getCenterLatitude());
         $this->assertEquals($expectedCenterLongitude, $boundingBox->getCenterLongitude());
     }
@@ -39,5 +36,22 @@ class BoundingBoxTest extends TestCase
             [-45.0, -160.0, -25.0, 60.0, -35.0, 130.0],
             [15.0, -160.0, 19.0, -60.0, 17.0, -110.0]
         ];
+    }
+
+    public function testExtendByZero()
+    {
+        $boundingBox = new BoundingBox(49.6, 7.6, 49.7, 7.7);
+
+        $this->assertThatBoundingBoxEquals([49.6, 7.6, 49.7, 7.7], $boundingBox);
+        $this->assertThatBoundingBoxEquals([49.6, 7.6, 49.7, 7.7], $boundingBox->extendBy(0.0));
+        $this->assertThatBoundingBoxEquals([49.6, 7.6, 49.7, 7.7], $boundingBox->extendBy(0.0, 0.0, 0.0, 0.0));
+    }
+
+    protected function assertThatBoundingBoxEquals(array $expectedBoundaries, BoundingBox $boundingBox)
+    {
+        $this->assertEquals($expectedBoundaries[0], $boundingBox->getMinLatitude());
+        $this->assertEquals($expectedBoundaries[1], $boundingBox->getMaxLatitude());
+        $this->assertEquals($expectedBoundaries[2], $boundingBox->getMinLongitude());
+        $this->assertEquals($expectedBoundaries[3], $boundingBox->getMaxLongitude());
     }
 }

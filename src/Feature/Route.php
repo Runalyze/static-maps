@@ -156,17 +156,13 @@ class Route implements FeatureInterface
             }
         }
 
-        if (0.0 < max($paddingTop, $paddingRight, $paddingBottom, $paddingLeft)) {
-            $deltaLatitude = $maxLatitude - $minLatitude;
-            $deltaLongitude = $maxLongitude - $minLongitude;
+        $boundingBox = new BoundingBox($minLatitude, $maxLatitude, $minLongitude, $maxLongitude);
 
-            $minLatitude -= $deltaLatitude * $paddingBottom / 100.0;
-            $maxLatitude += $deltaLatitude * $paddingTop / 100.0;
-            $minLongitude -= $deltaLongitude * $paddingLeft / 100.0;
-            $maxLongitude += $deltaLongitude * $paddingRight / 100.0;
+        if (0.0 < max($paddingTop, $paddingRight, $paddingBottom, $paddingLeft)) {
+            return $boundingBox->extendBy($paddingTop, $paddingRight, $paddingBottom, $paddingLeft);
         }
 
-        return new BoundingBox($minLatitude, $maxLatitude, $minLongitude, $maxLongitude);
+        return $boundingBox;
     }
 
     public function isEmpty(): bool
