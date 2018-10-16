@@ -32,35 +32,27 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
             return;
         }
 
-        $previousAngle = $this->getAngle($points[0][0], $points[0][1], $points[1][0], $points[1][1]);
-        $currentAngle = $previousAngle;
-
         for ($i = 0; $i < $numPoints - 1; ++$i) {
-            $nextAngle = $i < $numPoints - 2 ? $this->getAngle($points[$i + 1][0], $points[$i + 1][1], $points[$i + 2][0], $points[$i + 2][1]) : $currentAngle;
+            $currentAngle = $this->getAngle($points[$i][0], $points[$i][1], $points[$i + 1][0], $points[$i + 1][1]);
 
             list($Ax, $Ay) = $points[$i];
             list($Bx, $By) = $points[$i + 1];
 
-            $transitionAngleAtA = ($currentAngle + $previousAngle) / 2.0 - 90.0;
-            $transitionAngleAtB = ($currentAngle + $nextAngle) / 2.0 - 90.0;
-            $weightFactorAtA = 1.0 / cos(deg2rad(($previousAngle - $currentAngle) / 2.0));
-            $weightFactorAtB = 1.0 / cos(deg2rad(($currentAngle - $nextAngle) / 2.0));
-
             $weights = range(0.5 - $this->LineWidth / 2, $this->LineWidth / 2 - 0.5, 1.0);
 
             foreach ($weights as $weight) {
-                $this->drawAntialiasLineToBuffer(
-                    $Ax + $weight * $weightFactorAtA * cos(deg2rad($transitionAngleAtA)),
-                    $Ay + $weight * $weightFactorAtA * sin(deg2rad($transitionAngleAtA)),
-                    $Bx + $weight * $weightFactorAtB * cos(deg2rad($transitionAngleAtB)),
-                    $By + $weight * $weightFactorAtB * sin(deg2rad($transitionAngleAtB)),
-                    1
+                $this->drawAntialiasLinePixelwiseToBuffer(
+                    $Ax + $weight * cos(deg2rad($currentAngle - 90.0)),
+                    $Ay + $weight * sin(deg2rad($currentAngle - 90.0)),
+                    $Bx + $weight * cos(deg2rad($currentAngle - 90.0)),
+                    $By + $weight * sin(deg2rad($currentAngle - 90.0))
                 );
             }
 
-            $previousAngle = $currentAngle;
-            $currentAngle = $nextAngle;
+            $this->drawAntialiasCircleToBuffer($Ax, $Ay, $this->LineWidth);
         }
+
+        $this->drawAntialiasCircleToBuffer($Bx, $By, $this->LineWidth);
     }
 
     public function drawPolylines($resource)
@@ -72,27 +64,6 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         }
 
         $this->AlphaPixels = [];
-    }
-
-    protected function drawAntialiasLineToBuffer($x1, $y1, $x2, $y2, int $lineWidth = 1)
-    {
-        if (1 == $lineWidth) {
-            $this->drawAntialiasLinePixelwiseToBuffer($x1, $y1, $x2, $y2);
-
-            return;
-        }
-
-        $angle = deg2rad($this->getAngle($x1, $y1, $x2, $y2) - 90.0);
-        $weights = range(0.5 - $lineWidth / 2, $lineWidth / 2 - 0.5, 1.0);
-
-        foreach ($weights as $weight) {
-            $this->drawAntialiasLineToBuffer(
-                $x1 + $weight * cos($angle),
-                $y1 + $weight * sin($angle),
-                $x2 + $weight * cos($angle),
-                $y2 + $weight * sin($angle)
-            );
-        }
     }
 
     protected function drawAntialiasLinePixelwiseToBuffer($x1, $y1, $x2, $y2)
@@ -129,10 +100,32 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         }
     }
 
-    protected function drawAlphaPixelToBuffer(int $x, int $y, float $alpha)
+    protected function drawAntialiasCircleToBuffer(float $x, float $y, int $diameter)
+    {
+        $radius = (float)($diameter / 2);
+        $xRange = range(floor($x - $radius), ceil($x + $radius), 1.0);
+        $yRange = range(floor($y - $radius), ceil($y + $radius), 1.0);
+
+        foreach ($xRange as $xi) {
+            foreach ($yRange as $yi) {
+                $deltaX = $xi - $x;
+                $deltaY = $yi - $y;
+                $delta = sqrt($deltaX * $deltaX + $deltaY * $deltaY);
+                $alpha = 100.0 * max(0.0, min(1.0, $radius - $delta));
+
+                $this->drawAlphaPixelToBuffer((int)$xi, (int)$yi, $alpha, false);
+            }
+        }
+    }
+
+    protected function drawAlphaPixelToBuffer(int $x, int $y, float $alpha, bool $additiveAlpha = true)
     {
         if (isset($this->AlphaPixels[$x][$y])) {
-            $this->AlphaPixels[$x][$y] = min($this->PainterAlpha, $this->AlphaPixels[$x][$y] + $alpha);
+            if ($additiveAlpha) {
+                $this->AlphaPixels[$x][$y] = min($this->PainterAlpha, $this->AlphaPixels[$x][$y] + $alpha);
+            } else {
+                $this->AlphaPixels[$x][$y] = max($this->AlphaPixels[$x][$y], $alpha);
+            }
         } else {
             $this->AlphaPixels[$x][$y] = $alpha;
         }
@@ -140,12 +133,6 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
 
     protected function getAngle($x1, $y1, $x2, $y2): float
     {
-        $angle = rad2deg(atan2($y2 - $y1, $x2 - $x1));
-
-        if ($angle <= 0.0) {
-            return 360.0 - abs($angle);
-        }
-
-        return $angle;
+        return rad2deg(atan2($y2 - $y1, $x2 - $x1));
     }
 }
