@@ -57,4 +57,26 @@ class RouteTest extends TestCase
         $this->assertEquals($expected->getMinLongitude(), $actual->getMinLongitude(), '', 0.001);
         $this->assertEquals($expected->getMaxLongitude(), $actual->getMaxLongitude(), '', 0.001);
     }
+
+    /**
+     * @see https://github.com/Runalyze/static-maps/issues/3
+     */
+    public function testExampleWithBreaksInCoordinates()
+    {
+        $route = new Route([
+            [
+                [51.034692, 13.791008],
+                [51.034692, 13.791008]
+            ],
+            [
+                [51.034708, 13.790972],
+                [51.034720, 13.790943],
+                [51.034733, 13.790913],
+                [51.034747, 13.790882]
+            ]
+        ]);
+
+        $this->assertFalse($route->isEmpty());
+        $this->assertThatBoundingBoxIsEqual(new BoundingBox(51.034, 51.035, 13.790, 13.791), $route->getBoundingBox());
+    }
 }

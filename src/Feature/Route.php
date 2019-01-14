@@ -118,7 +118,7 @@ class Route implements FeatureInterface
             return [];
         }
 
-        if (2 == count($coordinates[0]) || !is_array($coordinates[0][0])) {
+        if (2 == count($coordinates[0]) && !is_array($coordinates[0][0])) {
             return [$coordinates];
         }
 
