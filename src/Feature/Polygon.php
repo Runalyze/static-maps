@@ -10,21 +10,6 @@ use Runalyze\StaticMaps\Drawer\Polyline\NativePolylineDrawer;
 
 class Polygon extends \Runalyze\StaticMaps\Feature\Route
 {
-    /**
-     * @param array $coordinates
-     * @param string|array $color
-     * @param int $lineWidth
-     */
-    public function __construct(array $coordinates, $lineColor = '#000', int $lineWidth = 1)
-    {
-        $this->LineSegments = $this->getLineSegments($coordinates);
-        $this->LineCallback = function (LineShape $draw) use ($lineColor) {
-            $draw->color($lineColor);
-        };
-        $this->LineWidth = $lineWidth;
-        $this->LineColor = $this->getLineColorArray($lineColor);
-    }
-
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
         $drawer = new NativePolygonDrawer();
@@ -45,7 +30,14 @@ class Polygon extends \Runalyze\StaticMaps\Feature\Route
         $drawer->drawPolygons($image);
     }
 
-    private function getPoints($viewport, $segment)
+    /**
+     * Converts coordinates into relative x,y pixel points for drawing as a polygon
+     *
+     * @param  ViewportInterface $viewport
+     * @param  array $segment
+     * @return array
+     */
+    private function getPoints(ViewportInterface $viewport, iterable $segment)
     {
         $points = [$this->getRelativePositionForPoint($viewport, $segment[0])];
         $numPoints = count($segment);

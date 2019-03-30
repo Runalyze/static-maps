@@ -34,8 +34,8 @@ class NativePolygonDrawer
         foreach ($this->Polylines as $points) {
             $numPoints = count($points);
 
-            $flattened = collect($points)->flatten()->toArray();
-            $image->polygon($flattened, function ($draw) use ($color) {
+            // Flatten points into one big flat array of integers
+            $image->polygon(array_merge(...$points), function ($draw) use ($color) {
                 $draw->border(1, $color);
                 $draw->background($color);
             });
