@@ -48,10 +48,10 @@ class ViewportTest extends TestCase
         $this->assertEquals(1398, $viewport->getStartY());
         $this->assertEquals(1399, $viewport->getEndY());
 
-        $this->assertEquals(49.3826, $viewport->getTileFittingBoundingBox()->getMinLatitude(), '', 0.0001);
-        $this->assertEquals(49.4967, $viewport->getTileFittingBoundingBox()->getMaxLatitude(), '', 0.0001);
-        $this->assertEquals(7.5586, $viewport->getTileFittingBoundingBox()->getMinLongitude(), '', 0.0001);
-        $this->assertEquals(7.8219, $viewport->getTileFittingBoundingBox()->getMaxLongitude(), '', 0.0001);
+        $this->assertEqualsWithDelta(49.3826, $viewport->getTileFittingBoundingBox()->getMinLatitude(), 0.0001);
+        $this->assertEqualsWithDelta(49.4967, $viewport->getTileFittingBoundingBox()->getMaxLatitude(), 0.0001);
+        $this->assertEqualsWithDelta(7.5586, $viewport->getTileFittingBoundingBox()->getMinLongitude(), 0.0001);
+        $this->assertEqualsWithDelta(7.8219, $viewport->getTileFittingBoundingBox()->getMaxLongitude(), 0.0001);
 
         $this->assertThatBoundingBoxesHaveTheSameCenter($viewport, $viewport->getBoundingBox(), $viewport->getPromisedBoundingBox());
         $this->assertThatTileBoundingBoxCoversOtherBoundingBox($viewport->getBoundingBox(), $viewport->getPromisedBoundingBox());
@@ -74,10 +74,10 @@ class ViewportTest extends TestCase
         $this->assertEquals(19, $viewport->getStartY());
         $this->assertEquals(23, $viewport->getEndY());
 
-        $this->assertEquals(40.9965, $viewport->getTileFittingBoundingBox()->getMinLatitude(), '', 0.0001);
-        $this->assertEquals(58.8137, $viewport->getTileFittingBoundingBox()->getMaxLatitude(), '', 0.0001);
-        $this->assertEquals(0.0, $viewport->getTileFittingBoundingBox()->getMinLongitude(), '', 0.0001);
-        $this->assertEquals(22.4780, $viewport->getTileFittingBoundingBox()->getMaxLongitude(), '', 0.0001);
+        $this->assertEqualsWithDelta(40.9965, $viewport->getTileFittingBoundingBox()->getMinLatitude(), 0.0001);
+        $this->assertEqualsWithDelta(58.8137, $viewport->getTileFittingBoundingBox()->getMaxLatitude(), 0.0001);
+        $this->assertEqualsWithDelta(0.0, $viewport->getTileFittingBoundingBox()->getMinLongitude(), 0.0001);
+        $this->assertEqualsWithDelta(22.4780, $viewport->getTileFittingBoundingBox()->getMaxLongitude(), 0.0001);
 
         $this->assertThatBoundingBoxesHaveTheSameCenter($viewport, $viewport->getBoundingBox(), $viewport->getPromisedBoundingBox());
         $this->assertThatTileBoundingBoxCoversOtherBoundingBox($viewport->getBoundingBox(), $viewport->getPromisedBoundingBox());
@@ -100,8 +100,8 @@ class ViewportTest extends TestCase
         $outerCenterX = ($viewport->longitudeToTileX($outerBoundingBox->getMinLongitude(), $viewport->getZoom()) + $viewport->longitudeToTileX($outerBoundingBox->getMaxLongitude(), $viewport->getZoom())) / 2.0;
         $outerCenterY = ($viewport->latitudeToTileY($outerBoundingBox->getMinLatitude(), $viewport->getZoom()) + $viewport->latitudeToTileY($outerBoundingBox->getMaxLatitude(), $viewport->getZoom())) / 2.0;
 
-        $this->assertEquals($innerCenterX, $outerCenterX, '', 0.005 * ($innerCenterX + $outerCenterX) / 2.0);
-        $this->assertEquals($innerCenterY, $outerCenterY, '', 0.005 * ($innerCenterY + $outerCenterY) / 2.0);
+        $this->assertEqualsWithDelta($innerCenterX, $outerCenterX, 0.005 * ($innerCenterX + $outerCenterX) / 2.0);
+        $this->assertEqualsWithDelta($innerCenterY, $outerCenterY, 0.005 * ($innerCenterY + $outerCenterY) / 2.0);
     }
 
     protected function assertThatTileOffsetsAreInValidRange($viewport)

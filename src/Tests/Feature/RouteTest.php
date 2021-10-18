@@ -52,10 +52,10 @@ class RouteTest extends TestCase
 
     protected function assertThatBoundingBoxIsEqual(BoundingBoxInterface $expected, BoundingBoxInterface $actual)
     {
-        $this->assertEquals($expected->getMinLatitude(), $actual->getMinLatitude(), '', 0.001);
-        $this->assertEquals($expected->getMaxLatitude(), $actual->getMaxLatitude(), '', 0.001);
-        $this->assertEquals($expected->getMinLongitude(), $actual->getMinLongitude(), '', 0.001);
-        $this->assertEquals($expected->getMaxLongitude(), $actual->getMaxLongitude(), '', 0.001);
+        $this->assertEqualsWithDelta($expected->getMinLatitude(), $actual->getMinLatitude(), 0.001);
+        $this->assertEqualsWithDelta($expected->getMaxLatitude(), $actual->getMaxLatitude(), 0.001);
+        $this->assertEqualsWithDelta($expected->getMinLongitude(), $actual->getMinLongitude(), 0.001);
+        $this->assertEqualsWithDelta($expected->getMaxLongitude(), $actual->getMaxLongitude(), 0.001);
     }
 
     /**

@@ -35,6 +35,6 @@ class AbstractTemplateBasedTileServiceTest extends TestCase
     {
         $service = new FakeTileService();
 
-        $this->assertRegExp('#^https://[abc].domain.tld/14/8544/5598.png$#', $service->getTileUrl($this->getDummyTile()));
+        $this->assertMatchesRegularExpression('#^https://[abc].domain.tld/14/8544/5598.png$#', $service->getTileUrl($this->getDummyTile()));
     }
 }
