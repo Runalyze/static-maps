@@ -1,7 +1,7 @@
 {
   "name": "runalyze/static-maps",
   "description": "Library to create static images from various map tile providers.",
-  "version": "0.5.0",
+  "version": "0.4.0",
   "license": "MIT",
   "require": {
     "php": ">=8.0",
