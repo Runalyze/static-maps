@@ -45,6 +45,6 @@ class CartoDB extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return 'OpenStreetMap © CartoDB';
+        return 'OpenStreetMap &copy; CartoDB';
     }
 }

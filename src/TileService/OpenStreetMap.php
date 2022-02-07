@@ -31,6 +31,6 @@ class OpenStreetMap extends AbstractTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '© OpenStreetMap';
+        return '&copy; OpenStreetMap';
     }
 }

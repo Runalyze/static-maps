@@ -46,6 +46,6 @@ class Mapbox extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '© Mapbox, OpenStreetMap';
+        return '&copy; Mapbox, OpenStreetMap';
     }
 }

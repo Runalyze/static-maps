@@ -45,6 +45,6 @@ class Stamen extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '© Map tiles by Stamen Design, CC BY 3.0 - Map data OpenStreetMap';
+        return '&copy; Map tiles by Stamen Design, CC BY 3.0 - Map data OpenStreetMap';
     }
 }

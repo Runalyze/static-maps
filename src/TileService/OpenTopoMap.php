@@ -31,6 +31,6 @@ class OpenTopoMap extends AbstractTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return 'Map data: © OpenStreetMap, SRTM | Map style: © OpenTopoMap (CC-BY-SA)';
+        return 'Map data: &copy; OpenStreetMap, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)';
     }
 }

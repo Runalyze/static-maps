@@ -70,6 +70,6 @@ class Thunderforest extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '© Thunderforest, OpenStreetMap';
+        return '&copy; Thunderforest, OpenStreetMap';
     }
 }
