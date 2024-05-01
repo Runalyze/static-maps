@@ -64,13 +64,13 @@ class TileMap implements FeatureInterface
 
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
-        $this->Image = $imageManager->canvas($viewport->getTileFittingWidth(), $viewport->getTileFittingHeight());
+        $this->Image = $imageManager->create($viewport->getTileFittingWidth(), $viewport->getTileFittingHeight());
 
         $this->readProjection($viewport);
         $this->createBaseMap($imageManager, $viewport);
         $this->cropImageToBoundaries($viewport);
 
-        $image->insert($this->Image);
+        $image->place($this->Image);
     }
 
     public function getFullImage(): Image
@@ -104,7 +104,7 @@ class TileMap implements FeatureInterface
                 $destX = ($x - $this->StartX) * $tileSize;
                 $destY = ($y - $this->StartY) * $tileSize;
 
-                $this->Image->insert($tileImage, 'top-left', $destX, $destY);
+                $this->Image->place($tileImage, 'top-left', $destX, $destY);
 
                 if ($this->IsDebuggingEnabled) {
                     $this->drawTileDebugInformation($x, $y, $destX, $destY, $tileSize);

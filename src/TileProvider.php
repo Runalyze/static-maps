@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps;
 
-use Intervention\Image\AbstractFont;
-use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Typography\FontFactory;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -31,24 +30,14 @@ use Runalyze\StaticMaps\TileService\TileServiceInterface;
 class TileProvider implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
-
-    /** @var TileServiceInterface */
-    protected $TileService;
-
-    /** @var ImageManager */
-    protected $ImageManager;
-
-    /** @var CacheInterface */
-    protected $Cache;
+    protected CacheInterface|NullCache $Cache;
 
     public function __construct(
-        TileServiceInterface $tileService,
-        ImageManager $imageManager,
+        protected TileServiceInterface $TileService,
+        protected ImageManager $ImageManager,
         CacheInterface $tileCache = null,
         LoggerInterface $logger = null
     ) {
-        $this->TileService = $tileService;
-        $this->ImageManager = $imageManager;
         $this->Cache = $tileCache ?? new NullCache();
         $this->logger = $logger ?? new NullLogger();
     }
@@ -79,7 +68,8 @@ class TileProvider implements LoggerAwareInterface
         }
 
         try {
-            $tileImage->setImage($this->ImageManager->make($tileImage->getTileUrl()));
+            $content = file_get_contents($tileImage->getTileUrl());
+            $tileImage->setImage($this->ImageManager->read($content));
         } catch (NotReadableException $e) {
             $this->logger->warning('Tile is not readable.', ['url' => $tileImage->getTileUrl()]);
         }
@@ -99,8 +89,8 @@ class TileProvider implements LoggerAwareInterface
         $centerPosition = (int)floor($tileSize / 2);
         $randColor = 225 + rand(0, 20);
 
-        $image = $this->ImageManager->canvas($tileSize, $tileSize, [$randColor, $randColor, $randColor]);
-        $image->text('Tile missing', $centerPosition, $centerPosition, function (AbstractFont $font) {
+        $image = $this->ImageManager->create($tileSize, $tileSize, [$randColor, $randColor, $randColor]);
+        $image->text('Tile missing', $centerPosition, $centerPosition, function (FontFactory $font) {
             $font->file(2);
             $font->color('#c00');
             $font->align('center');

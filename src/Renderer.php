@@ -32,7 +32,7 @@ class Renderer
     public function renderMap(MapInterface $map): Image
     {
         $projection = $map->getProjection();
-        $image = $this->ImageManager->canvas($projection->getWidth(), $projection->getHeight(), '#000');
+        $image = $this->ImageManager->create($projection->getWidth(), $projection->getHeight(), '#000');
 
         foreach ($map->getFeatures() as $feature) {
             $feature->render($this->ImageManager, $image, $projection);

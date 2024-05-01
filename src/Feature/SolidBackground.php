@@ -29,8 +29,8 @@ class SolidBackground implements FeatureInterface
 
     public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
     {
-        $image->insert(
-            $imageManager->canvas($viewport->getWidth(), $viewport->getHeight(), $this->Color)
+        $image->place(
+            $imageManager->create($viewport->getWidth(), $viewport->getHeight(), $this->Color)
         );
     }
 }

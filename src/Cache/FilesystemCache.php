@@ -13,20 +13,23 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps\Cache;
 
+use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemInterface;
 use Runalyze\StaticMaps\Tile\TileImageInterface;
 
 class FilesystemCache implements CacheInterface
 {
-    /** @var FilesystemInterface */
+    /** @var Filesystem */
     protected $Filesystem;
 
     /** @var ImageManager */
     protected $ImageManager;
 
-    public function __construct(FilesystemInterface $filesystem, ImageManager $imageManager)
+    public function __construct(Filesystem $filesystem, ImageManager $imageManager)
     {
         $this->Filesystem = $filesystem;
         $this->ImageManager = $imageManager;
@@ -45,13 +48,14 @@ class FilesystemCache implements CacheInterface
 
     public function hasTile(TileImageInterface $tile): bool
     {
-        return $this->Filesystem->has($this->getTilePath($tile));
+        return $this->Filesystem->fileExists($this->getTilePath($tile));
     }
 
     public function saveTile(TileImageInterface $tile): bool
     {
         if ($tile->hasImage()) {
-            return $this->Filesystem->put($this->getTilePath($tile), (string)$tile->getImage()->encode('png'));
+            $write =  $this->Filesystem->write($this->getTilePath($tile), (string)$tile->getImage()->encode(new PngEncoder()));
+            return $this->Filesystem->fileExists($this->getTilePath($tile));
         }
 
         return false;
@@ -61,7 +65,7 @@ class FilesystemCache implements CacheInterface
     {
         $contents = $this->Filesystem->read($this->getTilePath($tile));
 
-        $tile->setImage($this->ImageManager->make($contents));
+        $tile->setImage($this->ImageManager->read($contents));
 
         if (!$tile->hasImage()) {
             throw new \RuntimeException(sprintf('Tile cannot be found at %s.', $this->getTilePath($tile)));

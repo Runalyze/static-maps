@@ -16,6 +16,8 @@ namespace Runalyze\StaticMaps\Feature;
 use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Typography\Font;
+use Intervention\Image\Typography\FontFactory;
 use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class CopyrightNotice implements FeatureInterface
@@ -71,17 +73,17 @@ class CopyrightNotice implements FeatureInterface
         $this->applyFontCallbacks($font);
         $size = $font->getBoxSize();
 
-        $watermarkBackground = $imageManager->canvas($size['width'] + 10, $size['height'] + 5, $this->BackgroundColor);
-        $watermark = $imageManager->canvas($size['width'], $size['height']);
+        $watermarkBackground = $imageManager->create($size['width'] + 10, $size['height'] + 5, $this->BackgroundColor);
+        $watermark = $imageManager->create($size['width'], $size['height']);
 
         $font->applyToImage($watermark, 0, 2);
 
-        $watermarkBackground->insert($watermark, 'center');
+        $watermarkBackground->place($watermark, 'center');
 
-        $image->insert($watermarkBackground, $this->Position, $this->OffsetX, $this->OffsetY);
+        $image->place($watermarkBackground, $this->Position, $this->OffsetX, $this->OffsetY);
     }
 
-    protected function applyFontCallbacks(AbstractFont $font)
+    protected function applyFontCallbacks(FontFactory $font)
     {
         $font->valign('top');
         $font->color('#000');

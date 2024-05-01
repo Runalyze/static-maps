@@ -15,7 +15,7 @@ namespace Runalyze\StaticMaps\TileService;
 
 class OpenStreetMap extends AbstractTemplateBasedTileService
 {
-    protected $TileTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    protected $TileTemplate = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     protected $Subdomains = ['a', 'b', 'c'];
 
