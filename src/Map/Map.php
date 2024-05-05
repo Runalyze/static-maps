@@ -19,7 +19,7 @@ use Runalyze\StaticMaps\Viewport\ViewportInterface;
 class Map implements MapInterface
 {
     /** @var ViewportInterface */
-    protected $Viewport;
+    protected $Projection;
 
     /** @var FeatureInterface[] */
     protected $Features = [];
