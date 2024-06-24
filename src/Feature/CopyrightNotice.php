@@ -74,7 +74,7 @@ class CopyrightNotice implements FeatureInterface
         $watermarkBackground = $imageManager->canvas($size['width'] + 10, $size['height'] + 5, $this->BackgroundColor);
         $watermark = $imageManager->canvas($size['width'], $size['height']);
 
-        $font->applyToImage($watermark, 0, 2);
+        $font->applyToImage($watermark, 0, 0);
 
         $watermarkBackground->insert($watermark, 'center');
 
