@@ -2,9 +2,6 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 Library to create static images from various map tile providers.
@@ -26,21 +23,21 @@ $ composer require runalyze/static-maps
 For a full list of required use statements, see [example-1.php](docs/examples/example-1.php):
 
 ``` php
-$imageManager = new ImageManager(['driver' => 'gd']);
-$tileService = new OpenStreetMap();
-$tileCache = new FilesystemCache(new Filesystem(new Local(__DIR__.'/cache/tiles')), $imageManager);
-$tileProvider = new TileProvider($tileService, $imageManager, $tileCache);
+$imageManager = ImageManager::gd();
+$tileService = new OpenStreetMapDe();
+$tileCache = new FilesystemCache(new Filesystem(new LocalFilesystemAdapter(__DIR__.'/cache/tiles')), $imageManager);
+$tileProvider = new TileProvider($tileService, $imageManager, new \GuzzleHttp\Client(), $tileCache);
 
 $map = new Map(new Viewport(500, 350, new BoundingBox(53.40, 53.75, 9.90, 10.10), $tileService));
 $map->addFeature(new TileMap($tileProvider));
-$map->addFeature(new CopyrightNotice($tileService->getAttributionText(), function($font){
+$map->addFeature(new CopyrightNotice($tileService->getAttributionText(), function (\Intervention\Image\Typography\FontFactory $font) {
     $font->file('./resources/font/Roboto-Regular.ttf');
 }));
 
 $provider = new Renderer($imageManager);
 $image = $provider->renderMap($map);
 
-echo $image->response('png');
+file_put_contents('example-1.png', $image->toPng());
 ```
 
 ![Example for static map][link-example-1]
@@ -65,15 +62,9 @@ The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/runalyze/static-maps.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/runalyze/static-maps/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/runalyze/static-maps.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/runalyze/static-maps.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/runalyze/static-maps.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/runalyze/static-maps
-[link-travis]: https://travis-ci.org/Runalyze/static-maps
-[link-scrutinizer]: https://scrutinizer-ci.com/g/runalyze/static-maps/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/runalyze/static-maps
 [link-downloads]: https://packagist.org/packages/runalyze/static-maps
 
 [link-image]: https://github.com/Intervention/image

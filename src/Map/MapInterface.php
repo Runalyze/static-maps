@@ -22,7 +22,7 @@ interface MapInterface
 
     public function getProjection(): ViewportInterface;
 
-    public function addFeature(FeatureInterface $feature);
+    public function addFeature(FeatureInterface $feature): void;
 
     /**
      * @return FeatureInterface[]

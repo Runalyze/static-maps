@@ -19,25 +19,24 @@ class NativePolylineDrawer implements PolylineDrawerInterface
 {
     use PainterAwareTrait;
 
-    /** @var bool */
-    protected $IsNativeFunctionAvailable;
+    protected bool $IsNativeFunctionAvailable;
 
     /** @var array [polyline_1, polyline_2, ...] with each polyline [[x, y], [x, y], ...] */
-    protected $Polylines = [];
+    protected array $Polylines = [];
 
     public function __construct()
     {
         $this->IsNativeFunctionAvailable = function_exists('imageantialias');
     }
 
-    public function addPolyline(array $points)
+    public function addPolyline(array $points): void
     {
         $this->Polylines[] = array_map(function ($point) {
             return [(int)round($point[0]), (int)round($point[1])];
         }, $points);
     }
 
-    public function drawPolylines($resource)
+    public function drawPolylines($resource): void
     {
         $this->prepareNativeDrawing($resource);
 
@@ -52,7 +51,7 @@ class NativePolylineDrawer implements PolylineDrawerInterface
         }
     }
 
-    protected function prepareNativeDrawing($resource)
+    protected function prepareNativeDrawing($resource): void
     {
         imagesetthickness($resource, $this->LineWidth);
         imagealphablending($resource, true);

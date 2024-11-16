@@ -1,13 +1,15 @@
 {
   "name": "runalyze/static-maps",
   "description": "Library to create static images from various map tile providers.",
-  "version": "0.4.2",
+  "version": "1.0.0",
   "license": "MIT",
   "require": {
-    "php": ">=8.0",
+    "php": ">=8.2",
     "league/flysystem": "^3.12",
-    "intervention/image": "^2.6",
-    "psr/log": "^1.0"
+    "intervention/image": "^3.9",
+    "guzzlehttp/guzzle": "^7.0",
+    "psr/log": "^1.0 || ^2.0 || ^3.0",
+    "ext-gd": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
@@ -18,5 +20,9 @@
     "psr-4": {
       "Runalyze\\StaticMaps\\": "src/"
     }
+  },
+  "scripts": {
+    "phpunit": "phpunit",
+    "php-cs-fixer": "php-cs-fixer fix"
   }
 }

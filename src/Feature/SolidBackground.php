@@ -15,22 +15,21 @@ namespace Runalyze\StaticMaps\Feature;
 
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use Runalyze\StaticMaps\Projection\ViewportInterface;
+use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class SolidBackground implements FeatureInterface
 {
-    /** @var string|array */
-    protected $Color;
+    protected string|array $Color;
 
     public function __construct($color)
     {
         $this->Color = $color;
     }
 
-    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
+    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport): void
     {
-        $image->insert(
-            $imageManager->canvas($viewport->getWidth(), $viewport->getHeight(), $this->Color)
+        $image->place(
+            $imageManager->create($viewport->getWidth(), $viewport->getHeight())->fill($this->Color)
         );
     }
 }

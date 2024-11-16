@@ -17,10 +17,8 @@ use Runalyze\StaticMaps\Tile\TileInterface;
 
 class Mapbox extends AbstractVariantTemplateBasedTileService
 {
-    protected $TileTemplate = 'https://api.tiles.mapbox.com/v4/{variant}/{z}/{x}/{y}{r}.png';
-
-    /** @var string */
-    protected $AccessToken;
+    protected string $TileTemplate = 'https://api.tiles.mapbox.com/v4/{variant}/{z}/{x}/{y}{r}.png';
+    protected string $AccessToken;
 
     public function __construct(string $accessToken, string $mapId = 'mapbox.streets')
     {
@@ -46,6 +44,6 @@ class Mapbox extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '&copy; Mapbox, OpenStreetMap';
+        return '© Mapbox, OpenStreetMap';
     }
 }

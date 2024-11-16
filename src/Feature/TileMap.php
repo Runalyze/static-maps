@@ -13,42 +13,25 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps\Feature;
 
+use Intervention\Image\Geometry\Factories\RectangleFactory;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use Runalyze\StaticMaps\Cache\CacheInterface;
+use JetBrains\PhpStorm\NoReturn;
 use Runalyze\StaticMaps\Tile\Tile;
-use Runalyze\StaticMaps\Tile\TileImage;
-use Runalyze\StaticMaps\Tile\TileImageInterface;
-use Runalyze\StaticMaps\Tile\TileInterface;
 use Runalyze\StaticMaps\TileProvider;
 use Runalyze\StaticMaps\Viewport\BoundingBoxInterface;
 use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class TileMap implements FeatureInterface
 {
-    /** @var TileProvider */
-    protected $TileProvider;
-
-    /** @var Image */
-    protected $Image;
-
-    /** @var int */
-    protected $Zoom = 0;
-
-    /** @var int */
-    protected $StartX;
-
-    /** @var int */
-    protected $StartY;
-
-    /** @var int */
-    protected $EndX;
-
-    /** @var int */
-    protected $EndY;
-
-    /** @var bool */
-    protected $IsDebuggingEnabled = false;
+    protected TileProvider $TileProvider;
+    protected Image $Image;
+    protected int $Zoom = 0;
+    protected int $StartX;
+    protected int $StartY;
+    protected int $EndX;
+    protected int $EndY;
+    protected bool $IsDebuggingEnabled = false;
 
     public function __construct(TileProvider $tileProvider)
     {
@@ -62,15 +45,15 @@ class TileMap implements FeatureInterface
         return $this;
     }
 
-    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
+    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport): void
     {
-        $this->Image = $imageManager->canvas($viewport->getTileFittingWidth(), $viewport->getTileFittingHeight());
+        $this->Image = $imageManager->create($viewport->getTileFittingWidth(), $viewport->getTileFittingHeight());
 
         $this->readProjection($viewport);
         $this->createBaseMap($imageManager, $viewport);
         $this->cropImageToBoundaries($viewport);
 
-        $image->insert($this->Image);
+        $image->place($this->Image);
     }
 
     public function getFullImage(): Image
@@ -78,14 +61,15 @@ class TileMap implements FeatureInterface
         return $this->Image;
     }
 
-    public function debugFullImage()
+    #[NoReturn]
+    public function debugFullImage(): void
     {
-        echo $this->Image->response('png');
+        echo $this->Image->toPng();
 
         exit;
     }
 
-    protected function readProjection(ViewportInterface $viewport)
+    protected function readProjection(ViewportInterface $viewport): void
     {
         $this->Zoom = $viewport->getZoom();
 
@@ -93,7 +77,7 @@ class TileMap implements FeatureInterface
         list($this->StartY, $this->EndY) = $viewport->getRangeY();
     }
 
-    protected function createBaseMap(ImageManager $imageManager, ViewportInterface $viewport)
+    protected function createBaseMap(ImageManager $imageManager, ViewportInterface $viewport): void
     {
         $tileSize = $this->TileProvider->getTileSize();
 
@@ -104,7 +88,7 @@ class TileMap implements FeatureInterface
                 $destX = ($x - $this->StartX) * $tileSize;
                 $destY = ($y - $this->StartY) * $tileSize;
 
-                $this->Image->insert($tileImage, 'top-left', $destX, $destY);
+                $this->Image->place($tileImage, 'top-left', $destX, $destY);
 
                 if ($this->IsDebuggingEnabled) {
                     $this->drawTileDebugInformation($x, $y, $destX, $destY, $tileSize);
@@ -117,35 +101,36 @@ class TileMap implements FeatureInterface
         }
     }
 
-    protected function drawTileDebugInformation(int $x, int $y, int $destX, int $destY, int $tileSize)
+    protected function drawTileDebugInformation(int $x, int $y, int $destX, int $destY, int $tileSize): void
     {
-        $this->Image->rectangle($destX, $destY, $destX + $tileSize, $destY + $tileSize, function ($draw) {
-            $draw->border(1, '#c00');
+        $this->Image->drawRectangle($destX, $destY, function (RectangleFactory $rectangle) use ($destX, $destY, $tileSize) {
+            $rectangle->size($destX + $tileSize, $destY + $tileSize);
+            $rectangle->border('#c00', 1);
         });
 
-        $this->Image->text($x.' / '.$y, $destX + $tileSize / 2.0, $destY + $tileSize / 2.0, function ($draw) {
+        $this->Image->text($x.' / '.$y, (int)round($destX + $tileSize / 2.0), (int)round($destY + $tileSize / 2.0), function ($draw) {
             $draw->file(5);
             $draw->align('center');
             $draw->valign('center');
         });
     }
 
-    protected function drawBoundingBoxes(ViewportInterface $viewport)
+    protected function drawBoundingBoxes(ViewportInterface $viewport): void
     {
-        $this->drawBorderForBoundingBox($viewport, $viewport->getTileFittingBoundingBox(), function ($draw) {
-            $draw->border(2, '#0cc');
+        $this->drawBorderForBoundingBox($viewport, $viewport->getTileFittingBoundingBox(), function (RectangleFactory $draw) {
+            $draw->border('#0cc', 2);
         });
 
-        $this->drawBorderForBoundingBox($viewport, $viewport->getPromisedBoundingBox(), function ($draw) {
-            $draw->border(2, '#0c0');
+        $this->drawBorderForBoundingBox($viewport, $viewport->getPromisedBoundingBox(), function (RectangleFactory $draw) {
+            $draw->border('#0c0', 2);
         });
 
-        $this->drawBorderForBoundingBox($viewport, $viewport->getBoundingBox(), function ($draw) {
-            $draw->border(2, '#00c');
+        $this->drawBorderForBoundingBox($viewport, $viewport->getBoundingBox(), function (RectangleFactory $draw) {
+            $draw->border('#00c', 2);
         });
     }
 
-    protected function cropImageToBoundaries(ViewportInterface $viewport)
+    protected function cropImageToBoundaries(ViewportInterface $viewport): void
     {
         $tileSize = $this->TileProvider->getTileSize();
         list($upper, $right, $lower, $left) = $this->getExactBoundaries($viewport, $viewport->getBoundingBox());
@@ -168,28 +153,30 @@ class TileMap implements FeatureInterface
         ];
     }
 
-    protected function drawBorderForBoundingBox(ViewportInterface $viewport, BoundingBoxInterface $boundingBox, callable $callback, bool $drawMarkerForCenter = true)
+    protected function drawBorderForBoundingBox(ViewportInterface $viewport, BoundingBoxInterface $boundingBox, callable $callback, bool $drawMarkerForCenter = true): void
     {
         $tileSize = $this->TileProvider->getTileSize();
         $centerX = $viewport->longitudeToTileX($boundingBox->getCenterLongitude());
         $centerY = $viewport->latitudeToTileY($boundingBox->getCenterLatitude());
         list($upper, $right, $lower, $left) = $this->getExactBoundaries($viewport, $boundingBox);
 
-        $this->Image->rectangle(
+        $this->Image->drawRectangle(
             (int)(($left - $this->StartX) * $tileSize),
             (int)(($upper - $this->StartY) * $tileSize),
-            (int)(($right - $this->StartX) * $tileSize),
-            (int)(($lower - $this->StartY) * $tileSize),
-            $callback
+            function (RectangleFactory $rectangle) use ($right, $lower, $tileSize, $callback) {
+                $rectangle->size((int)(($right - $this->StartX) * $tileSize), (int)(($lower - $this->StartY) * $tileSize));
+                $callback($rectangle);
+            }
         );
 
         if ($drawMarkerForCenter) {
-            $this->Image->rectangle(
+            $this->Image->drawRectangle(
                 (int)(($centerX - $this->StartX) * $tileSize),
                 (int)(($centerY - $this->StartY) * $tileSize),
-                (int)(1 + ($centerX - $this->StartX) * $tileSize),
-                (int)(1 + ($centerY - $this->StartY) * $tileSize),
-                $callback
+                function (RectangleFactory $rectangle) use ($centerX, $centerY, $tileSize, $callback) {
+                    $rectangle->size((int)(1 + ($centerX - $this->StartX) * $tileSize), (int)(1 + ($centerY - $this->StartY) * $tileSize));
+                    $callback($rectangle);
+                }
             );
         }
     }

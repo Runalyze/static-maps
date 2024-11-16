@@ -85,7 +85,7 @@ class ViewportTest extends TestCase
         $this->assertThatTileOffsetsAreInValidRange($viewport);
     }
 
-    protected function assertThatTileBoundingBoxCoversOtherBoundingBox(BoundingBoxInterface $outerBoundingBox, BoundingBoxInterface $innerBoundingBox)
+    protected function assertThatTileBoundingBoxCoversOtherBoundingBox(BoundingBoxInterface $outerBoundingBox, BoundingBoxInterface $innerBoundingBox): void
     {
         $this->assertLessThanOrEqual($innerBoundingBox->getMinLatitude(), $outerBoundingBox->getMinLatitude());
         $this->assertGreaterThanOrEqual($innerBoundingBox->getMaxLatitude(), $outerBoundingBox->getMaxLatitude());
@@ -93,7 +93,7 @@ class ViewportTest extends TestCase
         $this->assertGreaterThanOrEqual($innerBoundingBox->getMaxLongitude(), $outerBoundingBox->getMaxLongitude());
     }
 
-    protected function assertThatBoundingBoxesHaveTheSameCenter(ViewportInterface $viewport, BoundingBoxInterface $outerBoundingBox, BoundingBoxInterface $innerBoundingBox)
+    protected function assertThatBoundingBoxesHaveTheSameCenter(ViewportInterface $viewport, BoundingBoxInterface $outerBoundingBox, BoundingBoxInterface $innerBoundingBox): void
     {
         $innerCenterX = ($viewport->longitudeToTileX($innerBoundingBox->getMinLongitude(), $viewport->getZoom()) + $viewport->longitudeToTileX($innerBoundingBox->getMaxLongitude(), $viewport->getZoom())) / 2.0;
         $innerCenterY = ($viewport->latitudeToTileY($innerBoundingBox->getMinLatitude(), $viewport->getZoom()) + $viewport->latitudeToTileY($innerBoundingBox->getMaxLatitude(), $viewport->getZoom())) / 2.0;
@@ -104,7 +104,7 @@ class ViewportTest extends TestCase
         $this->assertEqualsWithDelta($innerCenterY, $outerCenterY, 0.005 * ($innerCenterY + $outerCenterY) / 2.0);
     }
 
-    protected function assertThatTileOffsetsAreInValidRange($viewport)
+    protected function assertThatTileOffsetsAreInValidRange(Viewport $viewport): void
     {
         $this->assertGreaterThanOrEqual(0, $viewport->getTileOffsetX());
         $this->assertLessThanOrEqual(256, $viewport->getTileOffsetX());

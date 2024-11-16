@@ -20,13 +20,15 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
     use PainterAwareTrait;
 
     /** @var array [x][y] => alpha */
-    protected $AlphaPixels = [];
+    protected array $AlphaPixels = [];
 
-    public function addPolyline(array $points)
+    public function addPolyline(array $points): void
     {
         $numPoints = count($points);
 
-        if (1 == $numPoints) {
+        if (0 == $numPoints) {
+            return;
+        } elseif (1 == $numPoints) {
             $this->drawAntialiasPixelToBuffer($points[0][0], $points[0][1]);
 
             return;
@@ -55,7 +57,7 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         $this->drawAntialiasCircleToBuffer($Bx, $By, $this->LineWidth);
     }
 
-    public function drawPolylines($resource)
+    public function drawPolylines($resource): void
     {
         foreach ($this->AlphaPixels as $x => $yPixels) {
             foreach ($yPixels as $y => $alpha) {
@@ -66,7 +68,7 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         $this->AlphaPixels = [];
     }
 
-    protected function drawAntialiasLinePixelwiseToBuffer($x1, $y1, $x2, $y2)
+    protected function drawAntialiasLinePixelwiseToBuffer($x1, $y1, $x2, $y2): void
     {
         $distance = max(1.0, sqrt(($x2 - $x1) * ($x2 - $x1) + ($y2 - $y1) * ($y2 - $y1)));
 
@@ -78,7 +80,7 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         }
     }
 
-    protected function drawAntialiasPixelToBuffer(float $x, float $y)
+    protected function drawAntialiasPixelToBuffer(float $x, float $y): void
     {
         $xi = (int)floor($x);
         $yi = (int)floor($y);
@@ -100,7 +102,7 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         }
     }
 
-    protected function drawAntialiasCircleToBuffer(float $x, float $y, int $diameter)
+    protected function drawAntialiasCircleToBuffer(float $x, float $y, int $diameter): void
     {
         $radius = (float)($diameter / 2);
         $xRange = range(floor($x - $radius), ceil($x + $radius), 1.0);
@@ -118,7 +120,7 @@ class AntialiasPolylineDrawer implements PolylineDrawerInterface
         }
     }
 
-    protected function drawAlphaPixelToBuffer(int $x, int $y, float $alpha, bool $additiveAlpha = true)
+    protected function drawAlphaPixelToBuffer(int $x, int $y, float $alpha, bool $additiveAlpha = true): void
     {
         if (isset($this->AlphaPixels[$x][$y])) {
             if ($additiveAlpha) {

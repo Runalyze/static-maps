@@ -17,44 +17,30 @@ use Runalyze\StaticMaps\TileService\TileServiceInterface;
 
 abstract class AbstractViewport implements ViewportInterface
 {
-    /** @var int */
     const MAX_WIDTH = 2048;
-
-    /** @var int */
     const MAX_HEIGHT = 2048;
 
     /** @var int [px] */
-    protected $Width;
+    protected int $Width;
 
     /** @var int [px] */
-    protected $Height;
+    protected int $Height;
 
-    /** @var BoundingBoxInterface */
-    protected $TileFittingBoundingBox;
+    protected BoundingBoxInterface $TileFittingBoundingBox;
+    protected BoundingBoxInterface $PromisedBoundingBox;
+    protected BoundingBoxInterface $BoundingBox;
 
-    /** @var BoundingBoxInterface */
-    protected $PromisedBoundingBox;
-
-    /** @var BoundingBoxInterface */
-    protected $BoundingBox;
-
-    /** @var int */
-    protected $Zoom;
+    protected int $Zoom;
 
     /** @var int[] */
-    protected $RangeX;
+    protected array $RangeX;
 
     /** @var int[] */
-    protected $RangeY;
+    protected array $RangeY;
 
-    /** @var TileServiceInterface */
-    protected $TileService;
-
-    /** @var int */
-    protected $TileOffsetX = 0;
-
-    /** @var int */
-    protected $TileOffsetY = 0;
+    protected TileServiceInterface $TileService;
+    protected float $TileOffsetX = 0;
+    protected float $TileOffsetY = 0;
 
     public function getWidth(): int
     {

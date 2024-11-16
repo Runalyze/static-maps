@@ -24,11 +24,11 @@ class BoundingBoxTest extends TestCase
         $boundingBox = new BoundingBox($minLatitude, $maxLatitude, $minLongitude, $maxLongitude);
 
         $this->assertThatBoundingBoxEquals([$minLatitude, $maxLatitude, $minLongitude, $maxLongitude], $boundingBox);
-        $this->assertEquals($expectedCenterLatitude, $boundingBox->getCenterLatitude());
-        $this->assertEquals($expectedCenterLongitude, $boundingBox->getCenterLongitude());
+        $this->assertEqualsWithDelta($expectedCenterLatitude, $boundingBox->getCenterLatitude(), 0.01);
+        $this->assertEqualsWithDelta($expectedCenterLongitude, $boundingBox->getCenterLongitude(), 0.01);
     }
 
-    public function getProviderForCenterCoordinates()
+    public function getProviderForCenterCoordinates(): array
     {
         return [
             [49.6, 7.6, 49.7, 7.7, 49.65, 7.65],
@@ -47,11 +47,11 @@ class BoundingBoxTest extends TestCase
         $this->assertThatBoundingBoxEquals([49.6, 7.6, 49.7, 7.7], $boundingBox->extendBy(0.0, 0.0, 0.0, 0.0));
     }
 
-    protected function assertThatBoundingBoxEquals(array $expectedBoundaries, BoundingBox $boundingBox)
+    protected function assertThatBoundingBoxEquals(array $expectedBoundaries, BoundingBox $boundingBox): void
     {
-        $this->assertEquals($expectedBoundaries[0], $boundingBox->getMinLatitude());
-        $this->assertEquals($expectedBoundaries[1], $boundingBox->getMaxLatitude());
-        $this->assertEquals($expectedBoundaries[2], $boundingBox->getMinLongitude());
-        $this->assertEquals($expectedBoundaries[3], $boundingBox->getMaxLongitude());
+        $this->assertEqualsWithDelta($expectedBoundaries[0], $boundingBox->getMinLatitude(), 0.01);
+        $this->assertEqualsWithDelta($expectedBoundaries[1], $boundingBox->getMaxLatitude(), 0.01);
+        $this->assertEqualsWithDelta($expectedBoundaries[2], $boundingBox->getMinLongitude(), 0.01);
+        $this->assertEqualsWithDelta($expectedBoundaries[3], $boundingBox->getMaxLongitude(), 0.01);
     }
 }

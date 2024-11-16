@@ -15,9 +15,9 @@ namespace Runalyze\StaticMaps\TileService;
 
 class OpenTopoMap extends AbstractTemplateBasedTileService
 {
-    protected $TileTemplate = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+    protected string $TileTemplate = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
 
-    protected $Subdomains = ['a', 'b', 'c'];
+    protected array $Subdomains = ['a', 'b', 'c'];
 
     public function getMinZoom(): int
     {
@@ -31,6 +31,6 @@ class OpenTopoMap extends AbstractTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return 'Map data: &copy; OpenStreetMap, SRTM | Map style: &copy; OpenTopoMap (CC-BY-SA)';
+        return 'Map data: © OpenStreetMap, SRTM | Map style: © OpenTopoMap (CC-BY-SA)';
     }
 }

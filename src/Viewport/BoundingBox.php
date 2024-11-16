@@ -15,17 +15,10 @@ namespace Runalyze\StaticMaps\Viewport;
 
 class BoundingBox implements BoundingBoxInterface
 {
-    /** @var float */
-    protected $MinLatitude;
-
-    /** @var float */
-    protected $MaxLatitude;
-
-    /** @var float */
-    protected $MinLongitude;
-
-    /** @var float */
-    protected $MaxLongitude;
+    protected float $MinLatitude;
+    protected float $MaxLatitude;
+    protected float $MinLongitude;
+    protected float $MaxLongitude;
 
     public function __construct(float $minLatitude, float $maxLatitude, float $minLongitude, float $maxLongitude)
     {

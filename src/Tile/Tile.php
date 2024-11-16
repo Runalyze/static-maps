@@ -15,14 +15,9 @@ namespace Runalyze\StaticMaps\Tile;
 
 class Tile implements TileInterface
 {
-    /** @var int */
-    protected $X;
-
-    /** @var int */
-    protected $Y;
-
-    /** @var int */
-    protected $Zoom;
+    protected int $X;
+    protected int $Y;
+    protected int $Zoom;
 
     public function __construct(int $x, int $y, int $zoom)
     {

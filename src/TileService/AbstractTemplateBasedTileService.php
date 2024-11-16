@@ -17,9 +17,9 @@ use Runalyze\StaticMaps\Tile\TileInterface;
 
 abstract class AbstractTemplateBasedTileService implements TileServiceInterface
 {
-    protected $TileTemplate = 'https://{s}.sub.domain.tld/dir/{z}/{x}/{y}{r}.png';
+    protected string $TileTemplate = 'https://{s}.sub.domain.tld/dir/{z}/{x}/{y}{r}.png';
 
-    protected $Subdomains = [];
+    protected array $Subdomains = [];
 
     public function getTileUrl(TileInterface $tile, string $subDomain = '', string $r = ''): string
     {

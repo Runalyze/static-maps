@@ -23,7 +23,7 @@ interface TileImageInterface
 
     public function getTile(): TileInterface;
 
-    public function setImage(Image $image);
+    public function setImage(Image $image): void;
 
     public function getImage(): Image;
 

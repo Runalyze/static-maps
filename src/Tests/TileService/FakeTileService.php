@@ -17,9 +17,9 @@ use Runalyze\StaticMaps\TileService\AbstractTemplateBasedTileService;
 
 class FakeTileService extends AbstractTemplateBasedTileService
 {
-    protected $TileTemplate = 'https://{s}.domain.tld/{z}/{x}/{y}.png';
+    protected string $TileTemplate = 'https://{s}.domain.tld/{z}/{x}/{y}.png';
 
-    protected $Subdomains = ['a', 'b', 'c'];
+    protected array $Subdomains = ['a', 'b', 'c'];
 
     public function getMinZoom(): int
     {

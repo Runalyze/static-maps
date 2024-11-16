@@ -50,7 +50,7 @@ class RouteTest extends TestCase
         $this->assertThatBoundingBoxIsEqual(new BoundingBox(50.000, 51.110, 9.900, 10.100), $route->getBoundingBox(10.0, 0.0, 0.0, 50.0));
     }
 
-    protected function assertThatBoundingBoxIsEqual(BoundingBoxInterface $expected, BoundingBoxInterface $actual)
+    protected function assertThatBoundingBoxIsEqual(BoundingBoxInterface $expected, BoundingBoxInterface $actual): void
     {
         $this->assertEqualsWithDelta($expected->getMinLatitude(), $actual->getMinLatitude(), 0.001);
         $this->assertEqualsWithDelta($expected->getMaxLatitude(), $actual->getMaxLatitude(), 0.001);

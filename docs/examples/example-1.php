@@ -12,7 +12,7 @@
 require_once '../../vendor/autoload.php';
 
 use Intervention\Image\ImageManager;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\Filesystem;
 use Runalyze\StaticMaps\Cache\FilesystemCache;
 use Runalyze\StaticMaps\Feature\CopyrightNotice;
@@ -20,24 +20,24 @@ use Runalyze\StaticMaps\Feature\TileMap;
 use Runalyze\StaticMaps\Map\Map;
 use Runalyze\StaticMaps\Renderer;
 use Runalyze\StaticMaps\TileProvider;
-use Runalyze\StaticMaps\TileService\OpenStreetMap;
+use Runalyze\StaticMaps\TileService\OpenStreetMapDe;
 use Runalyze\StaticMaps\Viewport\BoundingBox;
 use Runalyze\StaticMaps\Viewport\Viewport;
 
-$imageManager = new ImageManager(['driver' => 'gd']);
-$tileService = new OpenStreetMap();
-$tileCache = new FilesystemCache(new Filesystem(new Local(__DIR__.'/cache/tiles')), $imageManager);
-$tileProvider = new TileProvider($tileService, $imageManager, $tileCache);
+$imageManager = ImageManager::gd();
+$tileService = new OpenStreetMapDe();
+$tileCache = new FilesystemCache(new Filesystem(new LocalFilesystemAdapter(__DIR__.'/cache/tiles')), $imageManager);
+$tileProvider = new TileProvider($tileService, $imageManager, new \GuzzleHttp\Client(), $tileCache);
 
 $viewport = new Viewport(500, 350, new BoundingBox(53.40, 53.75, 9.90, 10.10), $tileService);
 
 $map = new Map($viewport);
 $map->addFeature(new TileMap($tileProvider));
-$map->addFeature(new CopyrightNotice($tileService->getAttributionText(), function (\Intervention\Image\AbstractFont $font) {
+$map->addFeature(new CopyrightNotice($tileService->getAttributionText(), function (\Intervention\Image\Typography\FontFactory $font) {
     $font->file('../../resources/font/Roboto-Regular.ttf');
 }));
 
 $provider = new Renderer($imageManager);
 $image = $provider->renderMap($map);
 
-echo $image->response('png');
+file_put_contents('example-1.png', $image->toPng());

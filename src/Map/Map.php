@@ -18,11 +18,10 @@ use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class Map implements MapInterface
 {
-    /** @var ViewportInterface */
-    protected $Projection;
+    protected ViewportInterface $Projection;
 
     /** @var FeatureInterface[] */
-    protected $Features = [];
+    protected array $Features = [];
 
     public function __construct(ViewportInterface $viewport)
     {
@@ -34,7 +33,7 @@ class Map implements MapInterface
         return $this->Projection;
     }
 
-    public function addFeature(FeatureInterface $feature)
+    public function addFeature(FeatureInterface $feature): void
     {
         $this->Features[] = $feature;
     }

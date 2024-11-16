@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps;
 
-use Intervention\Image\AbstractFont;
-use Intervention\Image\Exception\NotReadableException;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use Intervention\Image\Colors\Rgb\Color;
+use Intervention\Image\Exceptions\RuntimeException;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Typography\FontFactory;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -32,23 +35,15 @@ class TileProvider implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var TileServiceInterface */
-    protected $TileService;
-
-    /** @var ImageManager */
-    protected $ImageManager;
-
-    /** @var CacheInterface */
-    protected $Cache;
+    protected CacheInterface $Cache;
 
     public function __construct(
-        TileServiceInterface $tileService,
-        ImageManager $imageManager,
+        protected TileServiceInterface $TileService,
+        protected ImageManager $ImageManager,
+        protected ClientInterface $Client,
         CacheInterface $tileCache = null,
         LoggerInterface $logger = null
     ) {
-        $this->TileService = $tileService;
-        $this->ImageManager = $imageManager;
         $this->Cache = $tileCache ?? new NullCache();
         $this->logger = $logger ?? new NullLogger();
     }
@@ -79,9 +74,10 @@ class TileProvider implements LoggerAwareInterface
         }
 
         try {
-            $tileImage->setImage($this->ImageManager->make($tileImage->getTileUrl()));
-        } catch (NotReadableException $e) {
-            $this->logger->warning('Tile is not readable.', ['url' => $tileImage->getTileUrl()]);
+            $request = $this->Client->request('GET', $tileImage->getTileUrl());
+            $tileImage->setImage($this->ImageManager->read($request->getBody()->getContents()));
+        } catch (GuzzleException|RuntimeException $e) {
+            $this->logger->warning('Tile is not readable.', ['url' => $tileImage->getTileUrl(), 'message' => $e->getMessage()]);
         }
 
         if ($tileImage->hasImage()) {
@@ -99,9 +95,8 @@ class TileProvider implements LoggerAwareInterface
         $centerPosition = (int)floor($tileSize / 2);
         $randColor = 225 + rand(0, 20);
 
-        $image = $this->ImageManager->canvas($tileSize, $tileSize, [$randColor, $randColor, $randColor]);
-        $image->text('Tile missing', $centerPosition, $centerPosition, function (AbstractFont $font) {
-            $font->file(2);
+        $image = $this->ImageManager->create($tileSize, $tileSize)->fill(new Color($randColor, $randColor, $randColor));
+        $image->text('Tile missing', $centerPosition, $centerPosition, function (FontFactory $font) {
             $font->color('#c00');
             $font->align('center');
         });

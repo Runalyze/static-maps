@@ -19,5 +19,5 @@ use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 interface FeatureInterface
 {
-    public function render(ImageManager $imangeManager, Image $image, ViewportInterface $viewport);
+    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport): void;
 }

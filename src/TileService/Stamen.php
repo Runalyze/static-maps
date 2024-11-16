@@ -15,18 +15,13 @@ namespace Runalyze\StaticMaps\TileService;
 
 class Stamen extends AbstractVariantTemplateBasedTileService
 {
-    /** @var string */
     const VARIANT_TONER = 'toner';
-
-    /** @var string */
     const VARIANT_TONER_LITE = 'toner-lite';
-
-    /** @var string */
     const VARIANT_TERRAIN = 'terrain';
 
-    protected $TileTemplate = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.png';
+    protected string $TileTemplate = 'https://stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.png';
 
-    protected $Subdomains = ['a', 'b', 'c', 'd'];
+    protected array $Subdomains = ['a', 'b', 'c', 'd'];
 
     public function __construct(string $variant = 'toner-lite')
     {
@@ -45,6 +40,6 @@ class Stamen extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '&copy; Map tiles by Stamen Design, CC BY 3.0 - Map data OpenStreetMap';
+        return '© Map tiles by Stamen Design, CC BY 3.0 - Map data OpenStreetMap';
     }
 }

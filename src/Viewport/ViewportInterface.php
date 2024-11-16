@@ -55,7 +55,7 @@ interface ViewportInterface
 
     public function getRelativePositionForLatitude(float $latitude): int;
 
-    public function getRelativePositionForLongitude(float $latitude): int;
+    public function getRelativePositionForLongitude(float $longitude): int;
 
     public function getRelativePositionForX(float $x): int;
 

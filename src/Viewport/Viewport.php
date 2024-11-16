@@ -39,10 +39,10 @@ class Viewport extends AbstractViewport
     {
         $this->calculateZoomToFitBounds($minimalBoundingBox);
 
-        return $this->extendBoundingBox($minimalBoundingBox);
+        return $this->extendBoundingBox();
     }
 
-    protected function calculateZoomToFitBounds(BoundingBoxInterface $minimalBoundingBox)
+    protected function calculateZoomToFitBounds(BoundingBoxInterface $minimalBoundingBox): void
     {
         $minZoom = $this->TileService->getMinZoom();
         $maxZoom = $this->TileService->getMaxZoom();
@@ -81,7 +81,7 @@ class Viewport extends AbstractViewport
         throw new \RuntimeException('Zoom couldn\'t be calculated.');
     }
 
-    public function extendBoundingBox()
+    public function extendBoundingBox(): BoundingBox
     {
         $tileSize = $this->TileService->getTileSize();
         $relativeTileSizeMinusOnePixel = ($tileSize - 1) / $tileSize;

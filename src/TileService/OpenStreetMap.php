@@ -15,9 +15,9 @@ namespace Runalyze\StaticMaps\TileService;
 
 class OpenStreetMap extends AbstractTemplateBasedTileService
 {
-    protected $TileTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    protected string $TileTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    protected $Subdomains = ['a', 'b', 'c'];
+    protected array $Subdomains = ['a', 'b', 'c'];
 
     public function getMinZoom(): int
     {
@@ -31,6 +31,6 @@ class OpenStreetMap extends AbstractTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return '&copy; OpenStreetMap';
+        return '© OpenStreetMap';
     }
 }

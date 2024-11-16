@@ -17,8 +17,7 @@ use Runalyze\StaticMaps\Tile\TileInterface;
 
 abstract class AbstractVariantTemplateBasedTileService extends AbstractTemplateBasedTileService
 {
-    /** @var string */
-    protected $Variant;
+    protected string $Variant;
 
     public function __construct(string $variant)
     {

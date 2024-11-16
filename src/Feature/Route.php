@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps\Feature;
 
-use Intervention\Image\Gd\Color;
-use Intervention\Image\Gd\Shapes\LineShape;
+use Intervention\Image\Colors\Rgb\Color;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Runalyze\StaticMaps\Drawer\Polyline\AntialiasPolylineDrawer;
@@ -24,54 +23,44 @@ use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class Route implements FeatureInterface
 {
-    /** @var array */
-    protected $LineSegments;
-
-    /** @var callable */
-    protected $LineCallback;
-
-    /** @var int */
-    protected $LineWidth;
-
-    /** @var array */
-    protected $LineColor;
+    protected array $LineSegments;
+    protected int $LineWidth;
+    protected array $LineColor;
 
     /** @var float [px] */
-    protected $LineSimplificationTolerance = 0.0;
+    protected float $LineSimplificationTolerance = 0.0;
 
     /**
      * @param array $coordinates
-     * @param string|array $color
+     * @param string|array $lineColor
      * @param int $lineWidth
      */
-    public function __construct(array $coordinates, $lineColor = '#000', int $lineWidth = 1)
+    public function __construct(array $coordinates, string|array $lineColor = '#000', int $lineWidth = 1)
     {
         $this->LineSegments = $this->getLineSegments($coordinates);
-        $this->LineCallback = function (LineShape $draw) use ($lineColor) {
-            $draw->color($lineColor);
-        };
         $this->LineWidth = $lineWidth;
         $this->LineColor = $this->getLineColorArray($lineColor);
     }
 
-    public function enableLineSimplification(float $pixelTolerance = 10.0)
+    public function enableLineSimplification(float $pixelTolerance = 10.0): void
     {
         $this->LineSimplificationTolerance = $pixelTolerance;
     }
 
-    public function disableLineSimplification()
+    public function disableLineSimplification(): void
     {
         $this->LineSimplificationTolerance = 0.0;
     }
 
     protected function getLineColorArray($lineColor): array
     {
-        $color = new Color($lineColor);
+        /** @var Color $color */
+        $color = Color::create($lineColor);
 
-        return [$color->r, $color->g, $color->b, 100.0 - $color->a / 1.27];
+        return [$color->red()->value(), $color->green()->value(), $color->blue()->value(), 100.0 * $color->alpha()->value() / 255];
     }
 
-    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
+    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport): void
     {
         $drawer = new AntialiasPolylineDrawer();
         $drawer->setPainter($this->LineColor[0], $this->LineColor[1], $this->LineColor[2], $this->LineColor[3], $this->LineWidth);
@@ -101,7 +90,7 @@ class Route implements FeatureInterface
             $drawer->addPolyline($points);
         }
 
-        $drawer->drawPolylines($image->getCore());
+        $drawer->drawPolylines($image->core()->native());
     }
 
     protected function getRelativePositionForPoint(ViewportInterface $viewport, array $point): array

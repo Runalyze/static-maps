@@ -15,21 +15,16 @@ namespace Runalyze\StaticMaps\Cache;
 
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Runalyze\StaticMaps\Tile\TileImageInterface;
 
 class FilesystemCache implements CacheInterface
 {
-    /** @var FilesystemInterface */
-    protected $Filesystem;
-
-    /** @var ImageManager */
-    protected $ImageManager;
-
-    public function __construct(FilesystemInterface $filesystem, ImageManager $imageManager)
-    {
-        $this->Filesystem = $filesystem;
-        $this->ImageManager = $imageManager;
+    public function __construct(
+        protected FilesystemOperator $Filesystem,
+        protected ImageManager $ImageManager
+    ) {
     }
 
     protected function getTilePath(TileImageInterface $tile): string
@@ -45,13 +40,19 @@ class FilesystemCache implements CacheInterface
 
     public function hasTile(TileImageInterface $tile): bool
     {
-        return $this->Filesystem->has($this->getTilePath($tile));
+        return $this->Filesystem->fileExists($this->getTilePath($tile));
     }
 
     public function saveTile(TileImageInterface $tile): bool
     {
         if ($tile->hasImage()) {
-            return $this->Filesystem->put($this->getTilePath($tile), (string)$tile->getImage()->encode('png'));
+            try {
+                $this->Filesystem->write($this->getTilePath($tile), (string)$tile->getImage()->toPng());
+            } catch (FilesystemException $e) {
+                return false;
+            }
+
+            return true;
         }
 
         return false;
@@ -61,7 +62,7 @@ class FilesystemCache implements CacheInterface
     {
         $contents = $this->Filesystem->read($this->getTilePath($tile));
 
-        $tile->setImage($this->ImageManager->make($contents));
+        $tile->setImage($this->ImageManager->read($contents));
 
         if (!$tile->hasImage()) {
             throw new \RuntimeException(sprintf('Tile cannot be found at %s.', $this->getTilePath($tile)));
@@ -72,6 +73,12 @@ class FilesystemCache implements CacheInterface
 
     public function deleteTile(TileImageInterface $tile): bool
     {
-        return $this->Filesystem->delete($this->getTilePath($tile));
+        try {
+            $this->Filesystem->delete($this->getTilePath($tile));
+        } catch (FilesystemException $e) {
+            return false;
+        }
+
+        return true;
     }
 }

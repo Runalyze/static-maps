@@ -16,15 +16,15 @@ namespace Runalyze\StaticMaps\Drawer;
 trait PainterAwareTrait
 {
     /** @var int[] [r, g, b] */
-    protected $PainterColor = [0, 0, 0];
+    protected array $PainterColor = [0, 0, 0];
 
     /** @var float (0.0 .. 100.0) */
-    protected $PainterAlpha = 100.0;
+    protected float $PainterAlpha = 100.0;
 
     /** @var int [px] */
-    protected $LineWidth = 1;
+    protected int $LineWidth = 1;
 
-    public function setPainter(int $r, int $g, int $b, float $alpha = 100.0, int $lineWidth = 1)
+    public function setPainter(int $r, int $g, int $b, float $alpha = 100.0, int $lineWidth = 1): void
     {
         $this->PainterColor = [$r, $g, $b];
         $this->PainterAlpha = $alpha;

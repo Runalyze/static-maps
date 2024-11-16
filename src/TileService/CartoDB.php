@@ -15,18 +15,13 @@ namespace Runalyze\StaticMaps\TileService;
 
 class CartoDB extends AbstractVariantTemplateBasedTileService
 {
-    /** @var string */
     const VARIANT_LIGHT = 'light_all';
-
-    /** @var string */
     const VARIANT_DARK = 'dark_all';
-
-    /** @var string */
     const VARIANT_VOYAGER = 'rastertiles/voyager';
 
-    protected $TileTemplate = 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.png';
+    protected string $TileTemplate = 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.png';
 
-    protected $Subdomains = ['a', 'b', 'c', 'd'];
+    protected array $Subdomains = ['a', 'b', 'c', 'd'];
 
     public function __construct(string $variant = 'light_all')
     {
@@ -45,6 +40,6 @@ class CartoDB extends AbstractVariantTemplateBasedTileService
 
     public function getAttributionText(): string
     {
-        return 'OpenStreetMap &copy; CartoDB';
+        return 'OpenStreetMap © CartoDB';
     }
 }

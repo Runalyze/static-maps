@@ -18,14 +18,9 @@ use Runalyze\StaticMaps\TileService\TileServiceInterface;
 
 class TileImage implements TileImageInterface
 {
-    /** @var TileServiceInterface */
-    protected $TileService;
-
-    /** @var TileInterface */
-    protected $Tile;
-
-    /** @var Image|null */
-    protected $Image = null;
+    protected TileServiceInterface $TileService;
+    protected TileInterface $Tile;
+    protected ?Image $Image = null;
 
     public function __construct(TileServiceInterface $service, TileInterface $tile, Image $image = null)
     {
@@ -49,7 +44,7 @@ class TileImage implements TileImageInterface
         return $this->Tile;
     }
 
-    public function setImage(Image $image)
+    public function setImage(Image $image): void
     {
         $this->Image = $image;
     }

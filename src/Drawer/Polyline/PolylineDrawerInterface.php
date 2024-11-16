@@ -27,12 +27,12 @@ interface PolylineDrawerInterface extends PainterAwareInterface
      *
      * @param array $points [[x, y], [x, y], ...]
      */
-    public function addPolyline(array $points);
+    public function addPolyline(array $points): void;
 
     /**
      * Draw polylines from stack
      *
      * @param resource $resource
      */
-    public function drawPolylines($resource);
+    public function drawPolylines($resource): void;
 }

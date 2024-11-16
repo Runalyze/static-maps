@@ -13,39 +13,34 @@ declare(strict_types=1);
 
 namespace Runalyze\StaticMaps\Feature;
 
-use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Typography\FontFactory;
 use Runalyze\StaticMaps\Viewport\ViewportInterface;
 
 class CopyrightNotice implements FeatureInterface
 {
-    /** @var string */
-    protected $Text;
+    protected string $Text;
 
     /** @var callable */
     protected $FontCallback;
-
-    /** @var string */
-    protected $BackgroundColor = 'rgba(255, 255, 255, 0.5)';
-
-    /** @var string */
-    protected $Position = 'bottom-right';
+    protected string $BackgroundColor = 'rgba(255, 255, 255, 0.5)';
+    protected string $Position = 'bottom-right';
 
     /** @var int [px] */
-    protected $OffsetX = 0;
+    protected int $OffsetX = 0;
 
     /** @var int [px] */
-    protected $OffsetY = 0;
+    protected int $OffsetY = 0;
 
     /**
      * @param string $text
-     * @param null|callable(AbstractFont): void $fontCallback
+     * @param null|callable(FontFactory): void $fontCallback
      */
     public function __construct(string $text, callable $fontCallback = null)
     {
         $this->Text = $text;
-        $this->FontCallback = $fontCallback ?? function (AbstractFont $font) {
+        $this->FontCallback = $fontCallback ?? function (FontFactory $font) {
         };
     }
 
@@ -65,27 +60,23 @@ class CopyrightNotice implements FeatureInterface
         return $this;
     }
 
-    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport)
+    public function render(ImageManager $imageManager, Image $image, ViewportInterface $viewport): void
     {
-        $font = new \Intervention\Image\Gd\Font($this->Text);
-        $this->applyFontCallbacks($font);
-        $size = $font->getBoxSize();
+        $boxSize = $imageManager->driver()->fontProcessor()->boxSize($this->Text, (new FontFactory($this->applyFontCallbacks(...)))());
 
-        $watermarkBackground = $imageManager->canvas($size['width'] + 10, $size['height'] + 5, $this->BackgroundColor);
-        $watermark = $imageManager->canvas($size['width'], $size['height']);
+        $watermark = $imageManager->create($boxSize->width(), $boxSize->height());
+        $watermark->text($this->Text, 0, 2, fn (FontFactory $font) => $this->applyFontCallbacks($font));
 
-        $font->applyToImage($watermark, 0, 2);
+        $watermarkBackground = $imageManager->create($boxSize->width() + 10, $boxSize->height() + 5)->fill($this->BackgroundColor);
+        $watermarkBackground->place($watermark, 'center');
 
-        $watermarkBackground->insert($watermark, 'center');
-
-        $image->insert($watermarkBackground, $this->Position, $this->OffsetX, $this->OffsetY);
+        $image->place($watermarkBackground, $this->Position, $this->OffsetX, $this->OffsetY);
     }
 
-    protected function applyFontCallbacks(AbstractFont $font)
+    protected function applyFontCallbacks(FontFactory $font): void
     {
         $font->valign('top');
         $font->color('#000');
-        $font->file(3);
         $font->size(9);
 
         if (null !== $this->FontCallback) {
